@@ -39,12 +39,14 @@ resource "aws_iam_role_policy_attachment" "terraform_lambda_iam_policy_kinesis_e
 # Lambda
 
 resource "aws_lambda_function" "terraform_kinesis_streamer_func" {
-  filename = "lambda_code.zip"
+  #filename = "lambda_code.zip"
+  filename = "breck_msg.zip"
   function_name = "kinesis_streamer_test_lambda_function"
   role = "${aws_iam_role.iam_for_terraform_lambda.arn}"
   handler = "lib/handler.testHandler"
   runtime = "nodejs4.3"
-  source_code_hash = "${base64sha256(file("lambda_code.zip"))}"
+  source_code_hash = "${base64sha256(file("breck_msg.zip"))}"
+  #source_code_hash = "${base64sha256(file("lambda_code.zip"))}"#
 }
 
 resource "aws_lambda_event_source_mapping" "kinesis_lambda_event_mapping" {
@@ -59,7 +61,7 @@ resource "aws_lambda_event_source_mapping" "kinesis_lambda_event_mapping" {
 
 ## Kinesis Streams
 resource "aws_kinesis_stream" "kinesis_streamer_test_stream" {
-  name = "terraform-kinesis-streamer-test-stream"
+  name = "terraform-kinesis-streamer-test-stream" #terraform-kinesis-streamer-test-stream
   shard_count = 1
   retention_period = 24
   shard_level_metrics = [
@@ -67,6 +69,6 @@ resource "aws_kinesis_stream" "kinesis_streamer_test_stream" {
     "OutgoingBytes"
   ]
   tags {
-    Environment = "terraform-kinesis-streamer-test"
+    Environment = "dev"
   }
 }

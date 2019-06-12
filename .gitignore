@@ -1,0 +1,9 @@
+# Compiled files
+*.tfstate
+*.tfstate.backup
+
+# Module dir
+.terraform/
+
+.DS_Store
+.idea

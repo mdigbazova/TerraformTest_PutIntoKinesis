@@ -1,13 +1,13 @@
-// applications/kinesis_streamer/lib/handler.js
+// applications/Kinesis_streamer/lib/handler.js
 
 import AWS from 'aws-sdk';
-const kinesis = new AWS.Kinesis();
+const Kinesis = new AWS.Kinesis();
 
 export function receiveEvent(event, context, callback) {
   console.log('testHandler');
-  console.log(`Event: ${JSON.stringify(event, null, 2)}`);
-  console.log(`Context: ${JSON.stringify(context, null, 2)}`);
-  const base64Data = event.Records[0].kinesis.data;
+  console.log('Event: ${JSON.stringify(event, null, 2)}');
+  console.log('Context: ${JSON.stringify(context, null, 2)}');
+  const base64Data = event.Records[0].Kinesis.data;
   const base64Decoded = new Buffer(base64Data, 'base64').toString()
   console.log(base64Decoded);
   return callback();
@@ -15,8 +15,8 @@ export function receiveEvent(event, context, callback) {
 
 export function publishEvent(event, context, callback) {
   console.log('testHandler');
-  console.log(`Event: ${JSON.stringify(event, null, 2)}`);
-  console.log(`Context: ${JSON.stringify(context, null, 2)}`);
+  console.log('Event: ${JSON.stringify(event, null, 2)}');
+  console.log('Context: ${JSON.stringify(context, null, 2)}');
 
   const params = {
     Data: '{ sample: "json-object" }',
@@ -24,15 +24,15 @@ export function publishEvent(event, context, callback) {
     StreamName: 'terraform-kinesis-streamer-test-stream'
   };
 
-  console.log('putting kinesis record');
-  kinesis.putRecord(params, (err, data) => {
+  console.log('putting Kinesis record');
+  Kinesis.putRecord(params, (err, data) => {
     if (err) {
-      console.error('error putting kinesis record');
+      console.error('error putting Kinesis record');
       console.error(err);
       return callback(err);
     }
 
-    console.log('kinesis put success');
+    console.log('Kinesis put success');
     console.log(JSON.stringify(data, null, 2));
     return callback();
   });
