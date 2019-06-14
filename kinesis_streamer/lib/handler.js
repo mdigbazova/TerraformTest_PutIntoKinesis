@@ -21,7 +21,7 @@ export function publishEvent(event, context, callback) {
   const params = {
     Data: '{ sample: "json-object" }',
     PartitionKey: 'resource-1',
-    StreamName: 'terraform-kinesis-streamer-test-stream'
+    StreamName: 'breck-test-kinesis-stream'
   };
 
   console.log('putting Kinesis record');

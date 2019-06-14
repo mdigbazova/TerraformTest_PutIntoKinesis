@@ -1,28 +1,30 @@
 provider "aws" {
-  region = "${var.aws_region}"
+  version = "~> 2.14"
+  region  = "${var.aws_region}"
 }
 
 # IAM
 
 ## IAM Role
 resource "aws_iam_role" "iam_for_terraform_lambda" {
-  name = "kinesis_streamer_iam_role"
+  name = "iam_for_lambda"
+
   assume_role_policy = <<EOF
-  {
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        "Action": "sts:AssumeRole",
-        "Principal": {
-          "Service": "lambda.amazonaws.com"
-        },
-        "Effect": "Allow"
-      }
-    ]
-  }
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "lambda.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
 EOF
 }
-
 
 ## IAM Role Policies
 
@@ -44,8 +46,8 @@ resource "aws_lambda_function" "terraform_kinesis_streamer_func" {
   function_name = "kinesis_streamer_test_lambda_function"
   role = "${aws_iam_role.iam_for_terraform_lambda.arn}"
   handler = "lib/handler.testHandler"
-  runtime = "nodejs4.3"
-  source_code_hash = "${base64sha256(file("breck_msg.zip"))}"
+  runtime = "nodejs8.10" #"nodejs4.3"
+  source_code_hash = "${base64sha256(filebase64sha256("breck_msg.zip"))}"
   #source_code_hash = "${base64sha256(file("lambda_code.zip"))}"#
 }
 
@@ -59,16 +61,26 @@ resource "aws_lambda_event_source_mapping" "kinesis_lambda_event_mapping" {
 
 # Kinesis
 
+# locals
+locals {
+  tags = {
+    SYSTEM            = "DaVinci"
+    OWNER             = "SolarWinds MSP Data Platform"
+    ENV_NAME          = "${var.environment}"
+    DESCRIPTION       = "Kinesis stream for test EventBus messages in project DaVinci KEA"
+    MANAGED_BY        = "Terraform"
+  }
+}
+
+
 ## Kinesis Streams
 resource "aws_kinesis_stream" "kinesis_streamer_test_stream" {
-  name = "terraform-kinesis-streamer-test-stream" #terraform-kinesis-streamer-test-stream
+  name = "breck-test-kinesis-stream" #terraform-kinesis-streamer-test-stream
   shard_count = 1
-  retention_period = 24
+  retention_period = 168
   shard_level_metrics = [
     "IncomingBytes",
     "OutgoingBytes"
   ]
-  tags {
-    Environment = "dev"
-  }
+  tags                = "${local.tags}"
 }
